@@ -1,0 +1,95 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using System.Xml;
+
+namespace Part2
+{
+    public partial class WebForm1 : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            List<Word> obListWords = new List<Word>();
+
+            // Start with XmlReader object  
+            //here, we try to setup Stream between the XML file nad xmlReader
+            using (XmlReader reader = XmlReader.Create(@"C:\Users\Asusü\Documents\visual studio 2015\Projects\ParkNetCodingChallenge1\ParkNetCodingChallenge1\bin\Debug\words.xml")) //.xml file path
+            {
+                while (reader.Read())
+                {
+                    Word obWord = new Word();
+                    if (reader.IsStartElement())
+                    {
+                        //return only when you have START tag  
+                        switch (reader.Name.ToString())
+                        {
+                            case "word":
+                                obWord.Text = reader.GetAttribute("text");
+                                obWord.Count = Convert.ToInt32(reader.GetAttribute("count"));
+                                obListWords.Add(obWord);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+
+            obListWords = obListWords.OrderBy(ob => ob.Count).ToList();   // if words list is not sorted.
+
+            HtmlTableRow row = new HtmlTableRow();          // create html table
+            HtmlTableCell cellText = new HtmlTableCell();
+            HtmlTableCell cellCount = new HtmlTableCell();
+            HtmlTableCell cellNumber = new HtmlTableCell();
+
+            cellNumber.InnerText = "#";
+            cellNumber.Width = "5%";
+            row.Cells.Add(cellNumber);
+
+            cellText.InnerText = "Words";
+            row.Cells.Add(cellText);
+
+            cellCount.InnerText = "Count";
+            row.Cells.Add(cellCount);
+
+            tableWords.Rows.Add(row);
+
+            for (int j = 0; j < 10; j++)    
+            {
+                row = new HtmlTableRow();
+
+                cellNumber = new HtmlTableCell();
+                cellNumber.InnerText = Convert.ToString(j + 1) + ".";
+                cellNumber.Width = "5%";
+                row.Cells.Add(cellNumber);
+
+                cellText = new HtmlTableCell();
+                cellText.InnerText = Convert.ToString(obListWords[obListWords.Count - j -1].Text);
+                row.Cells.Add(cellText);
+
+                cellCount = new HtmlTableCell();
+                cellCount.InnerText = Convert.ToString(obListWords[obListWords.Count - j - 1].Count);
+                row.Cells.Add(cellCount);
+                tableWords.Rows.Add(row);
+            }
+        }
+
+        //word object
+        public class Word 
+        {
+            public string Text { get; set; }
+            public int Count { get; set; }
+            public Word() { }
+            public Word(string text, int count)
+            {
+                Text = text;
+                Count = count;
+            }
+        }
+
+    }
+
+}
